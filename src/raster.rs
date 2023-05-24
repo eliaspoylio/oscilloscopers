@@ -1,4 +1,4 @@
-use std::ops::{Add, Deref};
+use std::ops::{Add};
 
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -130,13 +130,17 @@ fn viewport_to_canvas (p: Point) -> Point {
 }
 
 pub fn project_vertex (v: &mut Vertex) -> Point {
-    if v.z == 0 {
-        v.z = 1;
+    match v.z {
+        0 => {
+            Point {x: 0, y:0}
+        }
+        _ => {
+            viewport_to_canvas(Point { 
+                x: (v.x * super::DISTANCE / v.z), 
+                y: (v.y * super::DISTANCE / v.z)
+            })
+        }
     }
-    viewport_to_canvas(Point { 
-        x: (v.x * super::DISTANCE / v.z), 
-        y: (v.y * super::DISTANCE / v.z)
-    })
 }
 
 #[cfg(test)]
