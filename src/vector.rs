@@ -13,6 +13,7 @@ impl VPoint {
 
 }
 
+#[derive(Debug)]
 pub struct VertexF {
     pub x: f32,
     pub y: f32,
@@ -23,9 +24,38 @@ impl VertexF {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x: x, y: y, z: z }
     }
-}
 
-const f: f32 = 0.1;
+    pub fn rotate(&mut self, pitch: f32, yaw: f32, roll: f32) {
+        let cosa = yaw.cos();
+        let sina = yaw.sin();
+    
+        let cosb = pitch.cos();
+        let sinb = pitch.sin();
+    
+        let cosc = roll.cos();
+        let sinc = roll.sin();
+    
+        let axx = cosa*cosb;
+        let axy = cosa*sinb*sinc - sina*cosc;
+        let axz = cosa*sinb*cosc + sina*sinc;
+    
+        let ayx = sina*cosb;
+        let ayy = sina*sinb*sinc + cosa*cosc;
+        let ayz = sina*sinb*cosc - cosa*sinc;
+    
+        let azx = -sinb;
+        let azy = cosb*sinc;
+        let azz = cosb*cosc;
+
+        let px = self.x;
+        let py = self.y;
+        let pz = self.z;
+
+        self.x = axx*px + axy*py + axz*pz;
+        self.y = ayx*px + ayy*py + ayz*pz;
+        self.z = azx*px + azy*py + azz*pz;
+    }
+}
 
 fn interpolate_float(i0: f32, d0: f32, i1: f32, d1: f32, step: f32) -> Vec<f32> {
     if i0 == i1 {
@@ -87,7 +117,7 @@ pub fn draw_points_float(length: f32, points: Vec<VPoint>, stay: usize) -> Vec<(
     let mut vec = Vec::new();
     for point in points {
         for _ in 0..stay {
-            vec.push((point.x / super::SIZE as f32, point.y / super::SIZE as f32));
+            vec.push((point.x / super::SIZE_F, point.y / super::SIZE_F));
         }
     }
     let repeat = vec.iter().cloned().cycle().take(l as usize).collect();
@@ -95,16 +125,18 @@ pub fn draw_points_float(length: f32, points: Vec<VPoint>, stay: usize) -> Vec<(
 }
 
 fn viewport_to_canvas_f(p: VPoint) -> VPoint {
+    println!("{:?}\n", p);
     VPoint {
-        x: p.x * (super::CANVAS/super::SIZE) as f32,
-        y: p.y * (super::CANVAS/super::SIZE) as f32
+        x: p.x * super::CANVAS_F / super::SIZE_F,
+        y: p.y * super::CANVAS_F / super::SIZE_F
     }
 }
 
 pub fn project_vertex_f(v: &mut VertexF) -> VPoint {
+    println!("{:?}", v);
     viewport_to_canvas_f(VPoint {
-        x: (v.x * super::DISTANCE as f32 / v.z),
-        y: (v.y * super::DISTANCE as f32 / v.z),
+        x: (v.x * super::DISTANCE_F / v.z),
+        y: (v.y * super::DISTANCE_F / v.z),
     })
 }
 
