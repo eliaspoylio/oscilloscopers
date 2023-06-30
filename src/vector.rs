@@ -11,6 +11,10 @@ impl VPoint {
         VPoint { x: x, y: y }
     }
 
+    pub fn scroll(&mut self, x:f32, y:f32) {
+        self.x = self.x + x;
+        self.y = self.y + y;
+    } 
 }
 
 #[derive(Debug)]
