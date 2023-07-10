@@ -2,9 +2,37 @@ use hound;
 use std::f32::consts::PI;
 use std::i16;
 
-mod raster;
+//mod raster;
 mod vector;
-use crate::vector::{create_line_float, draw_points_float, project_vertex_f, VPoint, VertexF};
+mod matrix;
+use crate::vector::{create_line_float, draw_points_float, Point, VertexF};
+
+const SAMPLE_RATE: u32 = 96000;
+const SAMPLE_RATE_F: f32 = SAMPLE_RATE as f32;
+const SIZE: i32 = 100;
+const CANVAS: i32 = 200;
+const DISTANCE: i32 = 50;
+
+const SIZE_F: f32 = 100.;
+const CANVAS_F: f32 = 200.;
+const DISTANCE_F: f32 = 50.;
+
+fn main() -> () {//Result<(), hound::Error> {
+
+let mut mat_proj = matrix::Mat_4x4 {m: [[0.; 4]; 4]};
+mat_proj.make_projection(90., 1., 0.1, 1000.);
+
+}
+
+/* 
+use hound;
+use std::f32::consts::PI;
+use std::i16;
+
+//mod raster;
+mod vector;
+mod matrix;
+use crate::vector::{create_line_float, draw_points_float, Point, VertexF};
 
 const SAMPLE_RATE: u32 = 96000;
 const SAMPLE_RATE_F: f32 = SAMPLE_RATE as f32;
@@ -29,9 +57,9 @@ fn main() -> Result<(), hound::Error> {
     // /////////////////////////
 
   
-    let mut obj1 = [&mut VPoint::new(0., -40.), &mut VPoint::new(0., -60.)];
-    let mut obj2 = [&mut VPoint::new(0., -20.), &mut VPoint::new(0., -40.)];
-    let mut obj3 = [&mut VPoint::new(0., 0.), &mut VPoint::new(0., -20.)];
+    let mut obj1 = [&mut Point::new(0., -40.), &mut Point::new(0., -60.)];
+    let mut obj2 = [&mut Point::new(0., -20.), &mut Point::new(0., -40.)];
+    let mut obj3 = [&mut Point::new(0., 0.), &mut Point::new(0., -20.)];
 
     let mut cube: Vec<(f32, f32)> = Vec::new();
 
@@ -70,7 +98,7 @@ fn main() -> Result<(), hound::Error> {
             }
             else { o.scroll(2. * SIZE_F, 0.) }
         );
-        let linesarr: [Vec<VPoint>; 3] = [
+        let linesarr: [Vec<Point>; 3] = [
             create_line_float(*obj1[0], *obj1[1], 1.),
             create_line_float(*obj2[0], *obj2[1], 1.),
             create_line_float(*obj3[0], *obj3[1], 1.),
@@ -122,7 +150,7 @@ fn main() -> Result<(), hound::Error> {
             v.rotate(PI / 180., PI / 180., PI / 180.)
         }
 
-        let array: [Vec<VPoint>; 12] = [
+        let array: [Vec<Point>; 12] = [
             /*
             // The front face
             create_line_float(project_vertex_f(&mut v_af), project_vertex_f(&mut v_bf), 1.),
@@ -140,21 +168,21 @@ fn main() -> Result<(), hound::Error> {
             create_line_float(project_vertex_f(&mut v_cf), project_vertex_f(&mut v_cb), 1.),
             create_line_float(project_vertex_f(&mut v_df), project_vertex_f(&mut v_db), 1.),
             */
-            create_line_float(VPoint::new(v_af.x, v_af.y), VPoint::new(v_bf.x, v_bf.y), 1.),
-            create_line_float(VPoint::new(v_bf.x, v_bf.y), VPoint::new(v_cf.x, v_cf.y), 1.),
-            create_line_float(VPoint::new(v_cf.x, v_cf.y), VPoint::new(v_df.x, v_df.y), 1.),
-            create_line_float(VPoint::new(v_df.x, v_df.y), VPoint::new(v_af.x, v_af.y), 1.),
-            create_line_float(VPoint::new(v_ab.x, v_ab.y), VPoint::new(v_bb.x, v_bb.y), 1.),
-            create_line_float(VPoint::new(v_bb.x, v_bb.y), VPoint::new(v_cb.x, v_cb.y), 1.),
-            create_line_float(VPoint::new(v_cb.x, v_cb.y), VPoint::new(v_db.x, v_db.y), 1.),
-            create_line_float(VPoint::new(v_db.x, v_db.y), VPoint::new(v_ab.x, v_ab.y), 1.),
-            create_line_float(VPoint::new(v_af.x, v_af.y), VPoint::new(v_ab.x, v_ab.y), 1.),
-            create_line_float(VPoint::new(v_bf.x, v_bf.y), VPoint::new(v_bb.x, v_bb.y), 1.),
-            create_line_float(VPoint::new(v_cf.x, v_cf.y), VPoint::new(v_cb.x, v_cb.y), 1.),
-            create_line_float(VPoint::new(v_df.x, v_df.y), VPoint::new(v_db.x, v_db.y), 1.),
+            create_line_float(Point::new(v_af.x, v_af.y), Point::new(v_bf.x, v_bf.y), 1.),
+            create_line_float(Point::new(v_bf.x, v_bf.y), Point::new(v_cf.x, v_cf.y), 1.),
+            create_line_float(Point::new(v_cf.x, v_cf.y), Point::new(v_df.x, v_df.y), 1.),
+            create_line_float(Point::new(v_df.x, v_df.y), Point::new(v_af.x, v_af.y), 1.),
+            create_line_float(Point::new(v_ab.x, v_ab.y), Point::new(v_bb.x, v_bb.y), 1.),
+            create_line_float(Point::new(v_bb.x, v_bb.y), Point::new(v_cb.x, v_cb.y), 1.),
+            create_line_float(Point::new(v_cb.x, v_cb.y), Point::new(v_db.x, v_db.y), 1.),
+            create_line_float(Point::new(v_db.x, v_db.y), Point::new(v_ab.x, v_ab.y), 1.),
+            create_line_float(Point::new(v_af.x, v_af.y), Point::new(v_ab.x, v_ab.y), 1.),
+            create_line_float(Point::new(v_bf.x, v_bf.y), Point::new(v_bb.x, v_bb.y), 1.),
+            create_line_float(Point::new(v_cf.x, v_cf.y), Point::new(v_cb.x, v_cb.y), 1.),
+            create_line_float(Point::new(v_df.x, v_df.y), Point::new(v_db.x, v_db.y), 1.),
         ];
 
-        let mut lines: Vec<VPoint> = vec![];
+        let mut lines: Vec<Point> = vec![];
         for line in array {
             for l in line {
                 lines.push(l);
@@ -187,3 +215,4 @@ mod tests {
     #[test]
     fn test_trig() {}
 }
+*/

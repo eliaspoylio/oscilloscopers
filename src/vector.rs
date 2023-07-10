@@ -1,14 +1,14 @@
 use std::ops::Add;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct VPoint {
+pub struct Point {
     pub x: f32,
     pub y: f32,
 }
 
-impl VPoint {
-    pub fn new(x: f32, y: f32) -> VPoint {
-        VPoint { x: x, y: y }
+impl Point {
+    pub fn new(x: f32, y: f32) -> Point {
+        Point { x: x, y: y }
     }
 
     pub fn scroll(&mut self, x:f32, y:f32) {
@@ -78,9 +78,9 @@ fn interpolate_float(i0: f32, d0: f32, i1: f32, d1: f32, step: f32) -> Vec<f32> 
     values
 }
 
-pub fn create_line_float(p0: VPoint, p1: VPoint, step: f32) -> Vec<VPoint> {
+pub fn create_line_float(p0: Point, p1: Point, step: f32) -> Vec<Point> {
     let mut a = p0;
-    let mut b: VPoint = p1;
+    let mut b: Point = p1;
     let mut vec = Vec::new();
     if (p1.x - p0.x).abs() > (p1.y - p0.y).abs() {
         // Line is horizontal-ish
@@ -94,7 +94,7 @@ pub fn create_line_float(p0: VPoint, p1: VPoint, step: f32) -> Vec<VPoint> {
         let k = b.x as i8;
         for x in (j..k).map(|x| x as f32 * step) {
             if ys.len() > (x - a.x) as usize {
-                vec.push(VPoint::new(x, ys[(x - a.x) as usize]));
+                vec.push(Point::new(x, ys[(x - a.x) as usize]));
             }
         }
     } else {
@@ -109,14 +109,14 @@ pub fn create_line_float(p0: VPoint, p1: VPoint, step: f32) -> Vec<VPoint> {
         let k = b.y as i8;
         for y in (j..k).map(|y| y as f32 * step) {
             if xs.len() > (y - a.y) as usize {
-                vec.push(VPoint::new(xs[(y - a.y) as usize], y));
+                vec.push(Point::new(xs[(y - a.y) as usize], y));
             }
         }
     }
     vec
 }
 
-pub fn draw_points_float(length: f32, points: Vec<VPoint>, stay: usize) -> Vec<(f32, f32)> {
+pub fn draw_points_float(length: f32, points: Vec<Point>, stay: usize) -> Vec<(f32, f32)> {
     let l = (length * super::SAMPLE_RATE_F) as i32;
     let mut vec = Vec::new();
     for point in points {
@@ -128,17 +128,17 @@ pub fn draw_points_float(length: f32, points: Vec<VPoint>, stay: usize) -> Vec<(
     repeat
 }
 
-fn viewport_to_canvas_f(p: VPoint) -> VPoint {
+fn viewport_to_canvas_f(p: Point) -> Point {
     println!("{:?}\n", p);
-    VPoint {
+    Point {
         x: p.x * super::CANVAS_F / super::SIZE_F,
         y: p.y * super::CANVAS_F / super::SIZE_F
     }
 }
 
-pub fn project_vertex_f(v: &mut VertexF) -> VPoint {
+pub fn project_vertex_f(v: &mut VertexF) -> Point {
     println!("{:?}", v);
-    viewport_to_canvas_f(VPoint {
+    viewport_to_canvas_f(Point {
         x: (v.x * super::DISTANCE_F / v.z),
         y: (v.y * super::DISTANCE_F / v.z),
     })
