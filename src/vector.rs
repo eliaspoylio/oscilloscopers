@@ -128,6 +128,17 @@ pub fn draw_points_float(length: f32, points: Vec<Point>, stay: usize) -> Vec<(f
     repeat
 }
 
+pub fn draw_wireframe_triangle (p0: Point, p1: Point, p2: Point, step: f32) -> Vec<Point> { 
+    let mut a = create_line_float(p0, p1, step);
+    let mut b = create_line_float(p1, p2, step);
+    let mut c = create_line_float(p2, p0, step);
+    let mut abc = Vec::new();
+    abc.append(&mut a);
+    abc.append(&mut b);
+    abc.append(&mut c);
+    abc
+}
+
 fn viewport_to_canvas_f(p: Point) -> Point {
     println!("{:?}\n", p);
     Point {
