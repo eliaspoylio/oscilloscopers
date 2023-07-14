@@ -11,6 +11,13 @@ impl Point {
         Point { x: x, y: y }
     }
 
+    pub fn spread(x: f32, y: f32) -> Point {
+        Point {
+            x: x - super::SIZE_F/super::SIZE_F,
+            y: y - super::SIZE_F/super::SIZE_F
+        }
+    }
+
     pub fn scroll(&mut self, x:f32, y:f32) {
         self.x = self.x + x;
         self.y = self.y + y;
