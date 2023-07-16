@@ -80,6 +80,7 @@ fn vector_matrix_mult(rpt: &mut [f64; 5], ppt: [f64; 5], a: [[f64; 4]; 4]) -> ()
 }
 
 fn calculate_transformation(eyex: f64, eyey: f64, eyez: f64) -> [[f64; 4]; 4] {
+    //let mut rng = thread_rng();
     let mut t1 = &mut [[0.; 4]; 4];
     let mut t2 = &mut [[0.; 4]; 4];
 
@@ -93,13 +94,13 @@ fn calculate_transformation(eyex: f64, eyey: f64, eyez: f64) -> [[f64; 4]; 4] {
     t1[1][1] = ctheta;
 
     let r2 = (eyex * eyex + eyey * eyey + eyez * eyez).sqrt();
-    let sphi = -r1 / r2;
+    let sphi = -r1;
     let cphi = -eyez / r2;
     make_identity(&mut t2);
-    t1[1][1] = cphi;
-    t1[1][2] = sphi;
-    t1[2][1] = -sphi;
-    t1[2][2] = cphi;
+    t2[1][1] = cphi;
+    t2[1][2] = sphi;
+    t2[2][1] = -sphi;
+    t2[2][2] = cphi;
 
     let t = matrix_matrix_mult( t1, t2);
     t
@@ -141,11 +142,11 @@ fn main() -> Result<(), hound::Error> {
 
     ////////////////////////////////////////////
 
-    const MAPDIM: usize = 336;
-    const PIXEL_SPACING: usize = 700;
+    const MAPDIM: usize = 145;//336;
+    const PIXEL_SPACING: usize = 1;
     let mut eye_x = 30.;
     let mut eye_y = 60.;
-    let eye_z = 30.;
+    let eye_z = -360.;
 
     let center_x = 0;
     //let center_y = 0;
@@ -191,24 +192,24 @@ fn main() -> Result<(), hound::Error> {
             point_3d[cc].y = y;
             point_3d[cc].z = z as f64;
 
-            cc += 1;
+            //cc += 1;
             county += 1;
         }
-        //cc += 1;
+        cc += 1;
         countx += 1;
     }
 
     let mut points = [[Point3D {
         coord: [0.; 5],
         trans: [0.; 5],
-    }; 40]; 40];
+    }; 30]; 30];
 
-    countx = 30;
+    countx = points.len()-10;
 
-    for i in 0..40 {
-        countx = countx + 1;
-        let mut county = 30;
-        for j in 0..40 {
+    for i in 0..points.len() {
+        countx += 1;
+        let mut county = points.len()-10;
+        for j in 0..points.len() {
             points[i][j].coord[0] = i as f64 - 20.;
             points[i][j].coord[1] = j as f64 - 20.;
             points[i][j].coord[3] = 0.8;
@@ -268,7 +269,7 @@ fn main() -> Result<(), hound::Error> {
 
         let mut xcounter = countx as f64;
 
-        for i in 0..40 {
+        for i in 0..points.len() {
 
             xcounter += 0.5;
 
@@ -284,7 +285,7 @@ fn main() -> Result<(), hound::Error> {
                            
             let mut ycounter = county as f64;
 
-            for j in 0..40 {
+            for j in 0..points.len() {
                 let y = heightmap[xcounter as usize][ycounter as usize];
 
                 // TODO brigthness?
@@ -296,8 +297,8 @@ fn main() -> Result<(), hound::Error> {
             }
         }
 
-        for i in 0..40 {
-            for j in 0..40 {
+        for i in 0..points.len() {
+            for j in 0..points.len() {
                 vector_matrix_mult(&mut points[i][j].trans, points[i][j].coord, t);
             }
         }
@@ -305,15 +306,15 @@ fn main() -> Result<(), hound::Error> {
 
         let distance = 12.;
 
-        for i in 10..30 {
-            for j in 10..30 {
+        for i in 10..points.len()-10 {
+            for j in 10..points.len()-10 {
                 // TODO: brightness?
 
-                let current_x = distance * points[i][j].trans[0] + SIZE as f64 * 0.7;
-                let current_y = distance * points[i][j].trans[1] + SIZE as f64 * 0.5;
+                let current_x = distance * points[i][j].trans[0] * 0.5;
+                let current_y = distance * points[i][j].trans[1] * 0.5;
 
-                let ix = (current_x * 1.5) as f32;
-                let iy = (current_y - 100.) as f32;
+                let ix = (current_x) as f32;
+                let iy = (current_y - 50.) as f32;
 
                 if ix > -SIZE_F && ix < SIZE_F && iy > -SIZE_F && iy < SIZE_F {
                     frame.push(Point::new(ix, iy));
@@ -322,7 +323,7 @@ fn main() -> Result<(), hound::Error> {
                 }
             }
         }
-        let frame_points = draw_points_float(1. / 24., frame, 25);
+        let frame_points = draw_points_float(1. / 50., frame, 10);
         for point in frame_points {
             scene.push(point);
         }
