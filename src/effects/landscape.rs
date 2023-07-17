@@ -1,9 +1,10 @@
+#![forbid(unsafe_code)]
 use hound;
-use std::i16;
+use std::{i16, f64::consts::PI};
 
-mod matrix;
+//mod matrix;
 mod vector;
-use crate::vector::{create_line_float, draw_points_float, Point, VertexF};
+use crate::vector::{draw_points_float, Point};
 
 use rand::{thread_rng, Rng};
 
@@ -11,41 +12,121 @@ const SAMPLE_RATE: u32 = 96000;
 const SAMPLE_RATE_F: f32 = SAMPLE_RATE as f32;
 const SIZE: i32 = 100;
 
-const CANVAS: i32 = 200;
-const DISTANCE: i32 = 50;
+//const CANVAS: i32 = 200;
+//const DISTANCE: i32 = 50;
 
 const SIZE_F: f32 = 100.;
 const CANVAS_F: f32 = 200.;
 const DISTANCE_F: f32 = 50.;
 
 #[derive(Clone, Copy)]
-struct Star {
-    x: f32,
-    y: f32,
-    z: i32,
-    speed: i32,
-    bright: f32
+struct Point3D {
+    coord: [f64; 5],
+    trans: [f64; 5],
+    // TODO brightness?
 }
 
-impl Star {
-    fn empty() -> Star {
-        Star {x: 0., y: 0., z: 0, speed: 0, bright: 0.}
-    }
+#[derive(Clone, Copy)]
+struct Pos {
+    x: f64,
+    y: f64,
+    z: f64,
+}
 
-    fn init_star(&mut self) {
-        let mut rng = thread_rng();
-        let sx = (SIZE_F * 0.7) as i32;
-        let sy = (SIZE_F * 0.7) as i32;
-    
-        let x = rng.gen_range(-sx..sx) as f32;
-        let y = rng.gen_range(-sy..sy) as f32;
-
-        self.x = x.cos() * y * SIZE_F;
-        self.y = x.sin() * y * SIZE_F;
-        self.z = rng.gen_range(80..160) << 6;
-        self.speed = rng.gen_range(10..20);
-        self.bright = 0.01;
+impl Pos {
+    fn init() -> Pos {
+        Pos {
+            x: 0.,
+            y: 100.,
+            z: 0.,
+        }
     }
+}
+
+fn d2r(degrees: f64) -> f64
+{
+    let conversion = 0.1745327; // --> 3.14159 / 180.0;
+    degrees * conversion
+}
+
+fn  atan(x: f64, y: f64) -> f64
+{
+    if x == 0. {
+        0.
+    }
+    else
+    {
+        let mut angle = (y / x).atan();
+        if x < 0. {angle = PI + angle;}
+        angle
+    }
+}
+
+fn vector_matrix_mult(rpt: &mut [f64; 5], ppt: [f64; 5], a: [[f64; 4]; 4]) -> () {
+    let mut val = 0.;
+  
+    for i in 0..4 {
+        val = 0.;
+        for j in 0..4 {
+            val += ppt[j] * a[j][i];
+        }
+        rpt[i] = val;
+    }           
+
+    rpt[0] = rpt[0] * val;
+    rpt[1] = rpt[1] * val;
+    rpt[2] = rpt[2] * val;
+    rpt[3] = 1.;
+}
+
+fn calculate_transformation(eyex: f64, eyey: f64, eyez: f64) -> [[f64; 4]; 4] {
+    //let mut rng = thread_rng();
+    let mut t1 = &mut [[0.; 4]; 4];
+    let mut t2 = &mut [[0.; 4]; 4];
+
+    let r1 = (eyex * eyex + eyey * eyey).sqrt();
+    let stheta = eyex / r1;
+    let ctheta = eyey / r1;
+    make_identity(&mut t1);
+    t1[0][0] = ctheta;
+    t1[0][1] = stheta;
+    t1[1][0] = -stheta;
+    t1[1][1] = ctheta;
+
+    let r2 = (eyex * eyex + eyey * eyey + eyez * eyez).sqrt();
+    let sphi = -r1;
+    let cphi = -eyez / r2;
+    make_identity(&mut t2);
+    t2[1][1] = cphi;
+    t2[1][2] = sphi;
+    t2[2][1] = -sphi;
+    t2[2][2] = cphi;
+
+    let t = matrix_matrix_mult( t1, t2);
+    t
+}
+
+fn make_identity(m: &mut [[f64; 4]; 4]) -> () {
+    for i in 0..4 {
+        for j in 0..4 {
+            if i == j { m[i][j] = 1. }
+            else { m[i][j] = 0. }
+        }
+    }
+}
+
+fn matrix_matrix_mult(a: &mut [[f64; 4]; 4], b: &mut [[f64; 4]; 4]) -> [[f64; 4]; 4] {
+    let mut r = [[0.; 4]; 4];
+    for i in 0..4 {
+        for j in 0..4 {
+            let mut val = 0.;
+            for k in 0..4 {
+                val += a[i][k] * b[k][j];
+            }
+            r[i][j] = val;
+        }
+    }
+    r
 }
 
 fn main() -> Result<(), hound::Error> {
@@ -56,42 +137,193 @@ fn main() -> Result<(), hound::Error> {
         sample_format: hound::SampleFormat::Int,
     };
     let amplitude = i16::MAX as f32;
-    let mut writer = hound::WavWriter::create("stars.wav", spec).unwrap();
+    let mut writer = hound::WavWriter::create("landscape.wav", spec).unwrap();
     let mut scene: Vec<(f32, f32)> = Vec::new();
 
     ////////////////////////////////////////////
-    
-    const MAX_STARS: usize = 800;
-    let stars = &mut [Star::empty(); MAX_STARS];
-    let center_x = 0;//SIZE >> 1;
-    let center_y = 0;//SIZE >> 1;
 
-    for star in stars.iter_mut() {
-        star.init_star();
+    const MAPDIM: usize = 145;//336;
+    const PIXEL_SPACING: usize = 1;
+    let mut eye_x = 30.;
+    let mut eye_y = 60.;
+    let eye_z = -360.;
+
+    let center_x = 0;
+    //let center_y = 0;
+
+    let mut count = 0;
+
+    let heightmap: &mut [[f64; MAPDIM * 3]] = &mut [[0.; MAPDIM * 3]; MAPDIM * 3];
+    let mut rng = thread_rng();
+    const D: usize = ((MAPDIM * 2) / PIXEL_SPACING) + 1;
+    let point_3d = &mut [Pos::init(); D];
+
+    for x in 0..MAPDIM * 2 {
+        for y in 0..MAPDIM * 2 {
+            heightmap[x][y] = rng.gen();
+        }
     }
+
+    for _idx in 0..2 {
+        for x in 1..(MAPDIM * 2 - 1) {
+            for y in 1..(MAPDIM * 2 - 1) {
+                heightmap[x][y] = (heightmap[x - 1][y - 1]
+                    + heightmap[x - 1][y + 1]
+                    + heightmap[x + 1][y - 1]
+                    + heightmap[x + 1][y + 1]
+                    + heightmap[x][y - 1]
+                    + heightmap[x][y + 1]
+                    + heightmap[x - 1][y]
+                    + heightmap[x + 1][y])
+                    / 5.2;
+            }
+        }
+    }
+
+    let mut cc: usize = 0;
+    let mut countx: usize = 20;
+    //let mut county: usize = 0;
+
+    for x in (-(MAPDIM as i32)..(MAPDIM as i32)).step_by(PIXEL_SPACING) {
+        let mut county = 20;
+        for z in (-(MAPDIM as i32)..(MAPDIM as i32)).step_by(PIXEL_SPACING) {
+            let y = heightmap[countx][county];
+            point_3d[cc].x = x as f64 * 3.;
+            point_3d[cc].y = y;
+            point_3d[cc].z = z as f64;
+
+            //cc += 1;
+            county += 1;
+        }
+        cc += 1;
+        countx += 1;
+    }
+
+    let mut points = [[Point3D {
+        coord: [0.; 5],
+        trans: [0.; 5],
+    }; 30]; 30];
+
+    countx = points.len()-10;
+
+    for i in 0..points.len() {
+        countx += 1;
+        let mut county = points.len()-10;
+        for j in 0..points.len() {
+            points[i][j].coord[0] = i as f64 - 20.;
+            points[i][j].coord[1] = j as f64 - 20.;
+            points[i][j].coord[3] = 0.8;
+
+            let y = heightmap[countx][county];
+            // brightness?
+            points[i][j].coord[2] = y * 0.06;
+            points[i][j].coord[4] = points[i][j].coord[2];
+            
+            county += 1;
+        }
+    }
+    countx = 31;
+    let mut county = 31;
+
+    //let mut xcounter = 1.;
+    //let mut ycounter = 1.;
+    let mut xcountermover = 0.4;
+    let mut ycountermover = 0.4;
+
+    //const PI: f64 = 3.14159;
+    let d_theta = 0.005;// rotation speed
+    //let d_phi = PI / 8.;
 
     for _i in 1..2000 {
         let mut frame: Vec<Point> = Vec::new();
-        for star in stars.iter_mut() {
-            star.z -= star.speed;
 
-            if star.z <= 0 { star.init_star() };
+        count += 1;
 
-            let ix = (star.x / star.z as f32) + (center_x) as f32;
-            let iy = (star.y / star.z as f32) + (center_y) as f32;
+        let mut theta = atan(d2r(eye_x), d2r(eye_y));
+        let r1 = (eye_x * eye_x + eye_y * eye_y).sqrt();
+        //let r2 = (eye_x * eye_x + eye_y * eye_y + eye_z * eye_z).sqrt();
 
-            star.bright += 0.0095;
+        //let phi = atan(r1,eye_z);
+        
+        theta = theta - d_theta;
 
-            if ix > -SIZE_F && ix < SIZE_F && iy > -SIZE_F && iy < SIZE_F {
-                for _f in 0..star.bright.ceil() as i32 {
-                    frame.push(Point::new(ix, iy));   
-                }
+        eye_x = r1 * theta.cos();
+        eye_y = r1 * theta.sin();
+
+        let t = calculate_transformation(eye_x, eye_y, eye_z);
+
+        if count % 5 == 0 {
+            countx += xcountermover as usize;
+            county += ycountermover as usize;
+        }
+
+        if countx >= MAPDIM - 145 {
+            xcountermover = -xcountermover;
+            countx = MAPDIM - 145;
+        }
+
+        if countx <= 30 {
+            xcountermover = -xcountermover;
+            countx = 30;
+        }
+
+        let mut xcounter = countx as f64;
+
+        for i in 0..points.len() {
+
+            xcounter += 0.5;
+
+            if county >= MAPDIM - 145 {
+                ycountermover = -ycountermover;
+                county = MAPDIM - 145;
             }
-            else {
-                star.init_star();
+
+            if county <= 30 {
+                ycountermover = -ycountermover;
+                county = 30;
+            }
+                           
+            let mut ycounter = county as f64;
+
+            for j in 0..points.len() {
+                let y = heightmap[xcounter as usize][ycounter as usize];
+
+                // TODO brigthness?
+
+                points[i][j].coord[2] = y * 0.06;
+                points[i][j].coord[4] = points[i][j].coord[2];
+
+                ycounter += 1.;
             }
         }
-        let frame_points = draw_points_float(1. / 50., frame, 2);
+
+        for i in 0..points.len() {
+            for j in 0..points.len() {
+                vector_matrix_mult(&mut points[i][j].trans, points[i][j].coord, t);
+            }
+        }
+
+
+        let distance = 12.;
+
+        for i in 10..points.len()-10 {
+            for j in 10..points.len()-10 {
+                // TODO: brightness?
+
+                let current_x = distance * points[i][j].trans[0] * 0.5;
+                let current_y = distance * points[i][j].trans[1] * 0.5;
+
+                let ix = (current_x) as f32;
+                let iy = (current_y - 50.) as f32;
+
+                if ix > -SIZE_F && ix < SIZE_F && iy > -SIZE_F && iy < SIZE_F {
+                    frame.push(Point::new(ix, iy));
+                    frame.push(Point::new(ix + 1., iy));
+                    frame.push(Point::new(ix, iy + 1.));
+                }
+            }
+        }
+        let frame_points = draw_points_float(1. / 50., frame, 10);
         for point in frame_points {
             scene.push(point);
         }
