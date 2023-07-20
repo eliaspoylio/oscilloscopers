@@ -43,7 +43,7 @@ fn sum(x: Vec<Point>, y: Vec<Point>) -> Vec<Point> {
     z
 }
 
-fn sum_div(x: Vec<Point>, y: Vec<Point>) -> Vec<Point> {
+pub fn avg(x: Vec<Point>, y: Vec<Point>) -> Vec<Point> {
     let mut z = Vec::new();
     for it in x.iter().zip_longest(y.iter()) {
         match it {

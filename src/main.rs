@@ -1,11 +1,9 @@
 use hound;
-use std::{f32::consts::PI, i16};
+use std::i16;
 
 mod matrix;
 mod vector;
 use crate::vector::{create_line_float, draw_points_float, Point, VertexF};
-
-use rand::{thread_rng, Rng};
 
 mod effects;
 
@@ -33,6 +31,28 @@ fn main() -> Result<(), hound::Error> {
 
     ////////////////////////////////////////////
     
+    for i in effects::line2::line2() {
+        scene.push(i);
+    }
+    for i in effects::line::line() {
+        scene.push(i);
+    }
+    for i in effects::lines::lines() {
+        scene.push(i);
+    }
+    /*
+    let line = effects::line::line();
+    let lines = effects::lines::lines();
+    for i in 0..(line.len()-line.len()/10) {
+        scene.push(line[i]);
+    }
+    let mut counter = 0;
+    for i in (line.len()-line.len()/10)..line.len() {
+        //scene.push(((line[i].0+lines[counter].0/2.)/2., (line[i].1+lines[counter].1/2.)/2.));
+        if i%2==0 { scene.push(line[i]) } else { scene.push(lines[counter]) }
+        counter+=1;
+    }
+    */
     for _i in 0..200 {
         let c = effects::text::letter((1.,1.), 10.);
         let points = draw_points_float(1. / 50., c, 5);
