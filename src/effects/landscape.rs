@@ -1,23 +1,10 @@
-#![forbid(unsafe_code)]
-use hound;
-use std::{i16, f64::consts::PI};
+use std::f64::consts::PI;
 
-//mod matrix;
-mod vector;
 use crate::vector::{draw_points_float, Point};
 
 use rand::{thread_rng, Rng};
 
-const SAMPLE_RATE: u32 = 96000;
-const SAMPLE_RATE_F: f32 = SAMPLE_RATE as f32;
-const SIZE: i32 = 100;
-
-//const CANVAS: i32 = 200;
-//const DISTANCE: i32 = 50;
-
-const SIZE_F: f32 = 100.;
-const CANVAS_F: f32 = 200.;
-const DISTANCE_F: f32 = 50.;
+const SIZE_F: f32 = crate::SIZE_F;
 
 #[derive(Clone, Copy)]
 struct Point3D {
@@ -129,15 +116,7 @@ fn matrix_matrix_mult(a: &mut [[f64; 4]; 4], b: &mut [[f64; 4]; 4]) -> [[f64; 4]
     r
 }
 
-fn main() -> Result<(), hound::Error> {
-    let spec = hound::WavSpec {
-        channels: 2,
-        sample_rate: SAMPLE_RATE,
-        bits_per_sample: 16,
-        sample_format: hound::SampleFormat::Int,
-    };
-    let amplitude = i16::MAX as f32;
-    let mut writer = hound::WavWriter::create("landscape.wav", spec).unwrap();
+pub fn landscape() -> Vec<(f32, f32)> {
     let mut scene: Vec<(f32, f32)> = Vec::new();
 
     ////////////////////////////////////////////
@@ -148,8 +127,7 @@ fn main() -> Result<(), hound::Error> {
     let mut eye_y = 60.;
     let eye_z = -360.;
 
-    let center_x = 0;
-    //let center_y = 0;
+    //let center_x = 0;
 
     let mut count = 0;
 
@@ -331,12 +309,5 @@ fn main() -> Result<(), hound::Error> {
 
     /////////////////////////////////////////////
 
-    for f in scene {
-        writer.write_sample((f.0 * amplitude) as i16).unwrap();
-        writer.write_sample((f.1 * amplitude) as i16).unwrap();
-    }
-
-    println!("Length: {}", writer.len());
-    println!("Duration: {}", writer.duration() / spec.sample_rate);
-    writer.finalize()
+    scene
 }

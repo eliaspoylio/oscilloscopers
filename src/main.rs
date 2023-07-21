@@ -1,5 +1,6 @@
 use hound;
 use std::i16;
+use std::f32::consts::PI;
 
 mod matrix;
 mod vector;
@@ -30,6 +31,7 @@ fn main() -> Result<(), hound::Error> {
     let mut scene: Vec<(f32, f32)> = Vec::new();
 
     ////////////////////////////////////////////
+
     
     for i in effects::line2::line2() {
         scene.push(i);
@@ -40,21 +42,29 @@ fn main() -> Result<(), hound::Error> {
     for i in effects::lines::lines() {
         scene.push(i);
     }
-    /*
-    let line = effects::line::line();
+    for i in effects::landscape::landscape() {
+        scene.push(i);
+    }
+    /* 
     let lines = effects::lines::lines();
-    for i in 0..(line.len()-line.len()/10) {
-        scene.push(line[i]);
+    let landscape = effects::landscape::landscape();
+    for i in 0..(lines.len() - lines.len() / 2) {
+        scene.push(lines[i]);
     }
     let mut counter = 0;
-    for i in (line.len()-line.len()/10)..line.len() {
-        //scene.push(((line[i].0+lines[counter].0/2.)/2., (line[i].1+lines[counter].1/2.)/2.));
-        if i%2==0 { scene.push(line[i]) } else { scene.push(lines[counter]) }
-        counter+=1;
+    for i in (lines.len() - lines.len() / 2)..lines.len() {
+        let f = i as f32 / SIZE_F;
+        let sine = (0.01 * PI * 0.01 + f/2.).sin() / 10.;
+        scene.push((lines[i].0 + sine, lines[i].1 - sine));
+        counter += 1;
+    }
+    for i in counter..landscape.len() {
+        scene.push(landscape[i]);
     }
     */
+    
     for _i in 0..200 {
-        let c = effects::text::letter((1.,1.), 10.);
+        let c = effects::text::letter((1., 1.), 10.);
         let points = draw_points_float(1. / 50., c, 5);
         for point in points {
             scene.push(point);

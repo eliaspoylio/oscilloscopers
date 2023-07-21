@@ -8,7 +8,7 @@ pub fn lines() -> Vec<(f32, f32)> {
     let mut scene: Vec<(f32, f32)> = Vec::new();
     const LINES: usize = 16;
 
-    for i in (1..2000) {
+    for i in 1..2000 {
         let mut lines: Vec<Point> = Vec::new();
         for j in 0..LINES {
             let f = i as f32 / SIZE_F;
