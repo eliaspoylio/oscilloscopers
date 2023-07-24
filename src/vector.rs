@@ -23,8 +23,7 @@ impl Point {
         self.y = self.y + y;
     } 
 }
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct VertexF {
     pub x: f32,
     pub y: f32,
@@ -147,7 +146,6 @@ pub fn draw_wireframe_triangle (p0: Point, p1: Point, p2: Point, step: f32) -> V
 }
 
 fn viewport_to_canvas_f(p: Point) -> Point {
-    println!("{:?}\n", p);
     Point {
         x: p.x * super::CANVAS_F / super::SIZE_F,
         y: p.y * super::CANVAS_F / super::SIZE_F
@@ -155,7 +153,6 @@ fn viewport_to_canvas_f(p: Point) -> Point {
 }
 
 pub fn project_vertex_f(v: &mut VertexF) -> Point {
-    println!("{:?}", v);
     viewport_to_canvas_f(Point {
         x: (v.x * super::DISTANCE_F / v.z),
         y: (v.y * super::DISTANCE_F / v.z),

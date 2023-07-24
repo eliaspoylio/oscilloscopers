@@ -48,11 +48,11 @@ fn _swap_points(a: Point, b: Point) -> (Point, Point) {
 }
 
 pub fn draw_points(length: f32, points: Vec<Point>, stay: usize) -> Vec<(f32, f32)> {
-    let l = (length * super::SAMPLE_RATE_F) as i32;
+    let l = (length * crate::SAMPLE_RATE_F) as i32;
     let mut vec = Vec::new();
     for point in points {
                 for _ in 1..stay {
-                    vec.push((point.x as f32 / super::SIZE as f32, point.y as f32 / super::SIZE as f32));
+                    vec.push((point.x as f32 / crate::SIZE as f32, point.y as f32 / crate::SIZE as f32));
                 }
 
     }
@@ -124,8 +124,8 @@ pub fn draw_wireframe_triangle (p0: Point, p1: Point, p2: Point, step: usize) ->
 
 fn viewport_to_canvas (p: Point) -> Point {
     Point {
-        x: p.x * super::CANVAS/super::SIZE,
-        y: p.y * super::CANVAS/super::SIZE
+        x: p.x * crate::CANVAS/crate::SIZE,
+        y: p.y * crate::CANVAS/crate::SIZE
     }
 }
 
@@ -136,8 +136,8 @@ pub fn project_vertex (v: &mut Vertex) -> Point {
         }
         _ => {
             viewport_to_canvas(Point { 
-                x: (v.x * super::DISTANCE / v.z), 
-                y: (v.y * super::DISTANCE / v.z)
+                x: (v.x * crate::DISTANCE / v.z), 
+                y: (v.y * crate::DISTANCE / v.z)
             })
         }
     }
