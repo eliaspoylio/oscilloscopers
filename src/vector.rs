@@ -76,8 +76,10 @@ fn interpolate_float(i0: f32, d0: f32, i1: f32, d1: f32, step: f32) -> Vec<f32> 
     let mut d = d0;
     let j = i0 as i8;
     let k = i1 as i8;
-    // TODO: step argument?
-    for _ in (j..k).map(|x| x as f32 * step) {
+    let mut i = i0;
+    for _ in j..k {
+        i += step;
+        if i > i1 {break;}
         values.push(d);
         d = d + a;
     }
@@ -98,7 +100,7 @@ pub fn create_line_float(p0: Point, p1: Point, step: f32) -> Vec<Point> {
         let ys = interpolate_float(a.x, a.y, b.x, b.y, step);
         let j = a.x as i8;
         let k = b.x as i8;
-        for x in (j..k).map(|x| x as f32 * step) {
+        for x in (j..k).map(|x| x as f32) {
             if ys.len() > (x - a.x) as usize {
                 vec.push(Point::new(x, ys[(x - a.x) as usize]));
             }
@@ -113,7 +115,7 @@ pub fn create_line_float(p0: Point, p1: Point, step: f32) -> Vec<Point> {
         let xs = interpolate_float(a.y, a.x, b.y, b.x, step);
         let j = a.y as i8;
         let k = b.y as i8;
-        for y in (j..k).map(|y| y as f32 * step) {
+        for y in (j..k).map(|y| y as f32) {
             if xs.len() > (y - a.y) as usize {
                 vec.push(Point::new(xs[(y - a.y) as usize], y));
             }

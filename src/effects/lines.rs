@@ -23,7 +23,7 @@ pub fn lines() -> Vec<(f32, f32)> {
             let line = create_line_float(point1, point2, 0.99);
             line.iter().for_each(|p| lines.push(*p));
         }
-        let points = draw_points_float(1. / 50., lines, 5);
+        let points = draw_points_float(1. / 50., lines, 8);
         for point in points {
             scene.push(point);
         }

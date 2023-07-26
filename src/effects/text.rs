@@ -35,7 +35,7 @@ fn make_letter(
 }
 
 pub fn letter(char: char, coord: (f32, f32), size: f32, spread: f32) -> Vec<Point> {
-    let font: [(char, Vec<(Point, Point)>); 4] = [
+    let font = [
         (
             'c',
             vec![
@@ -116,6 +116,29 @@ pub fn letter(char: char, coord: (f32, f32), size: f32, spread: f32) -> Vec<Poin
                 (Point::new(0., -7.), Point::new(2., -7.)),
                 (Point::new(0., -8.), Point::new(9., -8.)),
                 (Point::new(0., -9.), Point::new(9., -9.)),
+            ],
+        ),
+        (
+            'm',
+            vec![
+                (Point::new(0., 0.), Point::new(1., 0.)),
+                (Point::new(8., 0.), Point::new(9., 0.)),
+                (Point::new(0., -1.), Point::new(2., -1.)),
+                (Point::new(7., -1.), Point::new(9., -1.)),
+                (Point::new(0., -1.), Point::new(3., -2.)),
+                (Point::new(6., -1.), Point::new(9., -2.)),
+                (Point::new(0., -3.), Point::new(9., -3.)),
+                (Point::new(0., -4.), Point::new(9., -4.)),
+                (Point::new(0., -5.), Point::new(2., -5.)),
+                (Point::new(7., -5.), Point::new(9., -5.)),
+                (Point::new(0., -6.), Point::new(2., -6.)),
+                (Point::new(7., -6.), Point::new(9., -6.)),
+                (Point::new(0., -7.), Point::new(2., -7.)),
+                (Point::new(7., -7.), Point::new(9., -7.)),
+                (Point::new(0., -8.), Point::new(2., -8.)),
+                (Point::new(7., -8.), Point::new(9., -8.)),
+                (Point::new(0., -9.), Point::new(2., -9.)),
+                (Point::new(7., -9.), Point::new(9., -9.)),
             ],
         ),
     ];

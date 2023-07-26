@@ -34,30 +34,6 @@ fn main() -> Result<(), hound::Error> {
     ////////////////////////////////////////////
 
     /* 
-    for i in effects::line2::line2() {
-        scene.push(i);
-    }
-    for i in effects::line::line() {
-        scene.push(i);
-    }
-    for i in effects::lines::lines() {
-        scene.push(i);
-    }
-    for i in effects::landscape::landscape() {
-        scene.push(i);
-    }
-    */
-    /* 
-    for i in effects::blocks::blocks() {
-        scene.push(i);
-    }
-    */
-    /* 
-    for i in effects::cube::cube() {
-        scene.push(i);
-    }
-    */ 
-    /* 
     let lines = effects::lines::lines();
     let landscape = effects::landscape::landscape();
     for i in 0..(lines.len() - lines.len() / 2) {
@@ -70,11 +46,9 @@ fn main() -> Result<(), hound::Error> {
         scene.push((lines[i].0 + sine, lines[i].1 - sine));
         counter += 1;
     }
-    for i in counter..landscape.len() {
-        scene.push(landscape[i]);
-    }
+
     */
-    
+    /*
     let font_size = 1.1;
     let mut f_x_0 = 0.;
     let mut f_x_1 = 50.;
@@ -92,7 +66,7 @@ fn main() -> Result<(), hound::Error> {
         code.append(&mut d);
         code.append(&mut e);
 
-        let mut music = effects::text::letter('c', (f_x_1-30., f_y-15.), font_size, 1.);
+        let mut music = effects::text::letter('m', (f_x_1-30., f_y-15.), font_size, 1.);
         let mut u = effects::text::letter('o', (f_x_1-15., f_y-15.), font_size, 1.);
         let mut s = effects::text::letter('d', (f_x_1, f_y-15.), font_size, 1.);
         let mut i = effects::text::letter('e', (f_x_1+15., f_y-15.), font_size, 1.);
@@ -122,6 +96,35 @@ fn main() -> Result<(), hound::Error> {
             if point.0 > -0.7 {scene.push(point);}    
         }
     }
+    */
+    /*
+    for i in effects::line2::line2() {
+        scene.push(i);
+    }*/
+    /*
+    for i in effects::line::line() {
+        scene.push(i);
+    }
+    
+    
+    for i in effects::lines::lines() {
+        scene.push(i);
+    }
+    for i in effects::landscape::landscape() {
+        scene.push(i);
+    }
+    
+    for i in effects::cube::cube() {
+        scene.push(i);
+    }
+    */
+    for i in effects::blocks::blocks() {
+        scene.push(i);
+    } 
+    
+    for i in effects::stars::stars() {
+        scene.push(i);
+    } 
     
 
     ////////////////////////////////////////////

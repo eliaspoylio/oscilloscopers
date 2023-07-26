@@ -9,6 +9,7 @@ const SPEED: f32 = 2.;
 const START: f32 = 300.;
 const END: f32 = 75.;
 const DEPTH: f32 = 20.;
+const SIZE_F: f32 = 1.;
 
 struct Cube {
     vertices: [VertexF; 8],
@@ -40,10 +41,26 @@ impl Cube {
             VertexF::new(centerx + CUBE_SIZE, centery + CUBE_SIZE, START + init_z),
             VertexF::new(centerx + CUBE_SIZE, centery - CUBE_SIZE, START + init_z),
             VertexF::new(centerx - CUBE_SIZE, centery - CUBE_SIZE, START + init_z),
-            VertexF::new(centerx - CUBE_SIZE, centery + CUBE_SIZE, START + DEPTH + init_z),
-            VertexF::new(centerx + CUBE_SIZE, centery + CUBE_SIZE, START + DEPTH  + init_z),
-            VertexF::new(centerx + CUBE_SIZE, centery - CUBE_SIZE, START + DEPTH  + init_z),
-            VertexF::new(centerx - CUBE_SIZE, centery - CUBE_SIZE, START + DEPTH  + init_z),
+            VertexF::new(
+                centerx - CUBE_SIZE,
+                centery + CUBE_SIZE,
+                START + DEPTH + init_z,
+            ),
+            VertexF::new(
+                centerx + CUBE_SIZE,
+                centery + CUBE_SIZE,
+                START + DEPTH + init_z,
+            ),
+            VertexF::new(
+                centerx + CUBE_SIZE,
+                centery - CUBE_SIZE,
+                START + DEPTH + init_z,
+            ),
+            VertexF::new(
+                centerx - CUBE_SIZE,
+                centery - CUBE_SIZE,
+                START + DEPTH + init_z,
+            ),
         ]
     }
 
@@ -64,19 +81,16 @@ fn zoom(vertices: [&mut VertexF; 8]) {
 
 pub fn blocks() -> Vec<(f32, f32)> {
     let mut blocks: Vec<(f32, f32)> = vec![];
-    let mut cubes = [
-        &mut Cube::new(),
-        &mut Cube::new(),
-        &mut Cube::new(),
-        &mut Cube::new(),
-    ];
+    let mut cubes = [&mut Cube::new()];
     for cube in cubes.iter_mut() {
         cube.init();
     }
 
     for _i in 1..3000 {
         for cube in cubes.iter_mut() {
-            if cube.vertices[0].z <= END { cube.init() }
+            if cube.vertices[0].z <= END {
+                cube.init()
+            }
             cube.update();
         }
         let mut lines: Vec<Point> = vec![];
@@ -113,9 +127,23 @@ pub fn blocks() -> Vec<(f32, f32)> {
                     lines.push(l);
                 }
             }
+
+            if _i % 2 == 0 {
+                let centerlines = [
+                    create_line_float(Point { x: 0., y: 0. }, Point { x: -SIZE_F, y: SIZE_F }, STEP),
+                    create_line_float(Point { x: 0., y: 0. }, Point { x: SIZE_F, y: SIZE_F }, STEP),
+                    create_line_float(Point { x: 0., y: 0. }, Point { x: SIZE_F, y: -SIZE_F }, STEP),
+                    create_line_float(Point { x: 0., y: 0. }, Point { x: -SIZE_F, y: -SIZE_F }, STEP),
+                ];
+                for line in centerlines.into_iter() {
+                    for l in line {
+                        lines.push(l);
+                    }
+                }
+            }
         }
-        
-        let cli = draw_points_float(1. / 50., lines, 5);
+
+        let cli = draw_points_float(1. / 50., lines, 8);
         for cl in cli {
             blocks.push(cl);
         }

@@ -26,7 +26,7 @@ pub fn line() -> Vec<(f32, f32)> {
                 vec![point1, point2],
                 2);
             for point in points {
-                scene.push((point.0*2., point.1*2.));
+                scene.push((point.0, point.1));
             }
         }
     }
