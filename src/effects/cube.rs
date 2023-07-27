@@ -1,8 +1,11 @@
 use std::f32::consts::PI;
 
-use crate::vector::{create_line_float, draw_points_float, project_vertex_f, Point, VertexF};
+use crate::{
+    vector::{create_line_float, draw_points_float, project_vertex_f, Point, VertexF},
+    SIZE_F,
+};
 
-const STEP: f32 = 1.;
+const STEP: f32 = 0.1;
 
 pub fn cube() -> Vec<(f32, f32)> {
     let mut cube: Vec<(f32, f32)> = Vec::new();
@@ -23,11 +26,16 @@ pub fn cube() -> Vec<(f32, f32)> {
         //rotate(PI / 4., (2. as f32).sqrt().atan(), v);
     }
 
-    for _i in 1..2000 {
+    let fade = 0.5;
+
+    for i in 1..2000 {
         let vertices = [
             &mut v_af, &mut v_bf, &mut v_cf, &mut v_df, &mut v_ab, &mut v_bb, &mut v_cb, &mut v_db,
         ];
         for v in vertices {
+            if i > 1750 {
+                v.min(fade);
+            }
             v.rotate(PI / 180., PI / 180., PI / 180.)
         }
 
@@ -54,7 +62,10 @@ pub fn cube() -> Vec<(f32, f32)> {
         }
         // Heuristics to fit for 50 fps
         let mut c = -1;
-        lines.retain(|_| { c += 1; return c % 2 == 0 });
+        lines.retain(|_| {
+            c += 1;
+            return c % 2 == 0;
+        });
 
         let cli = draw_points_float(1. / 50., lines, 10);
         for cl in cli {

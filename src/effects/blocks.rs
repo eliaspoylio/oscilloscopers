@@ -5,18 +5,20 @@ use crate::vector::{create_line_float, draw_points_float, project_vertex_f, Poin
 const SIZE: i32 = (crate::SIZE as f32 * 0.7) as i32;
 const CUBE_SIZE: f32 = 10.;
 const STEP: f32 = 1.;
-const SPEED: f32 = 2.;
-const START: f32 = 300.;
-const END: f32 = 75.;
-const DEPTH: f32 = 20.;
-const SIZE_F: f32 = 1.;
+const SPEED: f32 = 10.;
+const START: f32 = 500.;
+const END: f32 = 100.;
+const DEPTH: f32 = 40.;
 
 struct Cube {
     vertices: [VertexF; 8],
+    startx: f32,
+    starty: f32,
+    direction: bool,
 }
 
 impl Cube {
-    fn new() -> Cube {
+    fn new(startx: f32, starty: f32) -> Cube {
         Cube {
             vertices: [
                 VertexF::new(0., 0., 290.),
@@ -28,14 +30,16 @@ impl Cube {
                 VertexF::new(0., 0., 270.),
                 VertexF::new(0., 0., 270.),
             ],
+            startx: startx,
+            starty: starty,
+            direction: true,
         }
     }
 
     fn init(&mut self) {
-        let mut rng = thread_rng();
-        let centerx = rng.gen_range(-SIZE..SIZE) as f32;
-        let centery = rng.gen_range(-SIZE..SIZE) as f32;
-        let init_z = rng.gen_range(100..5 * SIZE) as f32;
+        let centerx = self.startx as f32;
+        let centery = self.starty as f32;
+        let init_z = 0.;
         self.vertices = [
             VertexF::new(centerx - CUBE_SIZE, centery + CUBE_SIZE, START + init_z),
             VertexF::new(centerx + CUBE_SIZE, centery + CUBE_SIZE, START + init_z),
@@ -61,12 +65,20 @@ impl Cube {
                 centery - CUBE_SIZE,
                 START + DEPTH + init_z,
             ),
-        ]
+        ];
+        self.direction = true;
     }
 
     fn update(&mut self) {
-        for v in self.vertices.iter_mut() {
-            v.z -= SPEED;
+        if self.direction == true {
+            for v in self.vertices.iter_mut() {
+                v.z -= SPEED;
+            }
+        }
+        if self.direction == false {
+            for v in self.vertices.iter_mut() {
+                v.z += SPEED;
+            }
         }
     }
 }
@@ -81,15 +93,23 @@ fn zoom(vertices: [&mut VertexF; 8]) {
 
 pub fn blocks() -> Vec<(f32, f32)> {
     let mut blocks: Vec<(f32, f32)> = vec![];
-    let mut cubes = [&mut Cube::new()];
+    let mut cubes = [
+        &mut Cube::new(-20., 20.),
+        &mut Cube::new(20., 20.),
+        &mut Cube::new(20., -20.),
+        &mut Cube::new(-20., -20.),
+    ];
     for cube in cubes.iter_mut() {
         cube.init();
     }
 
-    for _i in 1..3000 {
+    for _i in 1..1000 {
         for cube in cubes.iter_mut() {
             if cube.vertices[0].z <= END {
-                cube.init()
+                cube.direction = false;
+            }
+            if cube.vertices[0].z >= START {
+                cube.direction = true;
             }
             cube.update();
         }
@@ -127,23 +147,9 @@ pub fn blocks() -> Vec<(f32, f32)> {
                     lines.push(l);
                 }
             }
-
-            if _i % 2 == 0 {
-                let centerlines = [
-                    create_line_float(Point { x: 0., y: 0. }, Point { x: -SIZE_F, y: SIZE_F }, STEP),
-                    create_line_float(Point { x: 0., y: 0. }, Point { x: SIZE_F, y: SIZE_F }, STEP),
-                    create_line_float(Point { x: 0., y: 0. }, Point { x: SIZE_F, y: -SIZE_F }, STEP),
-                    create_line_float(Point { x: 0., y: 0. }, Point { x: -SIZE_F, y: -SIZE_F }, STEP),
-                ];
-                for line in centerlines.into_iter() {
-                    for l in line {
-                        lines.push(l);
-                    }
-                }
-            }
         }
 
-        let cli = draw_points_float(1. / 50., lines, 8);
+        let cli = draw_points_float(1. / 50., lines, 7);
         for cl in cli {
             blocks.push(cl);
         }

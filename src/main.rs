@@ -1,11 +1,10 @@
 use hound;
 use std::i16;
-use std::f32::consts::PI;
 
 mod matrix;
 mod vector;
 mod raster;
-use crate::vector::{create_line_float, draw_points_float, Point, VertexF};
+use crate::vector::draw_points_float;
 
 mod effects;
 
@@ -32,32 +31,16 @@ fn main() -> Result<(), hound::Error> {
     let mut scene: Vec<(f32, f32)> = Vec::new();
 
     ////////////////////////////////////////////
-
-    /* 
-    let lines = effects::lines::lines();
-    let landscape = effects::landscape::landscape();
-    for i in 0..(lines.len() - lines.len() / 2) {
-        scene.push(lines[i]);
-    }
-    let mut counter = 0;
-    for i in (lines.len() - lines.len() / 2)..lines.len() {
-        let f = i as f32 / SIZE_F;
-        let sine = (0.01 * PI * 0.01 + f/2.).sin() / 10.;
-        scene.push((lines[i].0 + sine, lines[i].1 - sine));
-        counter += 1;
-    }
-
-    */
-    /*
+    
     let font_size = 1.1;
     let mut f_x_0 = 0.;
     let mut f_x_1 = 50.;
     let mut f_x_2 = 150.;
     let f_y = 0.;
-    for _i in 0..2000 {
-        f_x_0 -= 0.2;
-        f_x_1 -= 0.17;
-        f_x_2 -= 0.22;
+    for _i in 0..1000 {
+        f_x_0 -= 0.3;
+        f_x_1 -= 0.27;
+        f_x_2 -= 0.32;
         let mut code = effects::text::letter('c', (f_x_0-30., f_y), font_size, 1.);
         let mut o = effects::text::letter('o', (f_x_0-15., f_y), font_size, 1.);
         let mut d = effects::text::letter('d', (f_x_0, f_y), font_size, 1.);
@@ -75,7 +58,7 @@ fn main() -> Result<(), hound::Error> {
         music.append(&mut s);
         music.append(&mut i);
         music.append(&mut c);
-
+        
         let mut spew = effects::text::letter('c', (f_x_2-30., f_y), font_size, 1.);
         let mut y = effects::text::letter('o', (f_x_2-15., f_y), font_size, 1.);
         let mut s = effects::text::letter('c', (f_x_2+15., f_y), font_size, 1.);
@@ -96,16 +79,6 @@ fn main() -> Result<(), hound::Error> {
             if point.0 > -0.7 {scene.push(point);}    
         }
     }
-    */
-    /*
-    for i in effects::line2::line2() {
-        scene.push(i);
-    }*/
-    /*
-    for i in effects::line::line() {
-        scene.push(i);
-    }
-    
     
     for i in effects::lines::lines() {
         scene.push(i);
@@ -114,13 +87,13 @@ fn main() -> Result<(), hound::Error> {
         scene.push(i);
     }
     
+    for i in effects::blocks::blocks() {
+        scene.push(i);
+    }
+
     for i in effects::cube::cube() {
         scene.push(i);
     }
-    */
-    for i in effects::blocks::blocks() {
-        scene.push(i);
-    } 
     
     for i in effects::stars::stars() {
         scene.push(i);

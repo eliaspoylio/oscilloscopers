@@ -12,7 +12,7 @@ pub fn line() -> Vec<(f32, f32)> {
         for j in 0..LINES {
             let f = i as f32 / SIZE_F;
             let point1 = Point {
-                x: -(0.01 * PI * 130. * f).sin() * (j * 10) as f32,
+                x: -(0.01 * PI * 130. * f).sin() * ((j * 10) as f32).sin(),
                 y: (0.01 * PI * 60. * f).sin() * 64.,
             };
             let point2 = Point {

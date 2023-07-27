@@ -43,12 +43,13 @@ pub fn stars() -> Vec<(f32, f32)> {
     let stars = &mut [Star::empty(); MAX_STARS];
     let center_x = 0;//SIZE >> 1;
     let center_y = 0;//SIZE >> 1;
+    let mut fade = 1.;
 
     for star in stars.iter_mut() {
         star.init_star();
     }
 
-    for _i in 1..1000 {
+    for _i in 1..2000 {
         let mut frame: Vec<Point> = Vec::new();
         for star in stars.iter_mut() {
             star.z -= star.speed;
@@ -71,7 +72,16 @@ pub fn stars() -> Vec<(f32, f32)> {
         }
         let frame_points = draw_points_float(1. / 24., frame, 2);
         for point in frame_points {
-            scene.push(point);
+            if _i > 1500 {
+                scene.push((
+                    point.0 * fade,
+                    point.1 * fade
+                ));
+                fade -= 0.00001;
+            }
+            else {
+                scene.push(point);   
+            }
         }
     }
 

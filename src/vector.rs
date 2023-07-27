@@ -65,6 +65,22 @@ impl VertexF {
         self.y = ayx*px + ayy*py + ayz*pz;
         self.z = azx*px + azy*py + azz*pz;
     }
+
+    pub fn min(&mut self, f: f32) {
+        if self.x > 0. {
+            self.x -= f; 
+        }
+        else {
+            self.x += f; 
+        }
+        if self.y > 0. {
+            self.y -= f; 
+        }
+        else {
+            self.y += f; 
+        }
+        //self.z += f;
+    }
 }
 
 fn interpolate_float(i0: f32, d0: f32, i1: f32, d1: f32, step: f32) -> Vec<f32> {
