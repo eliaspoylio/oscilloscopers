@@ -50,21 +50,21 @@ fn main() -> Result<(), hound::Error> {
         code.append(&mut e);
 
         let mut music = effects::text::letter('m', (f_x_1-30., f_y-15.), font_size, 1.);
-        let mut u = effects::text::letter('o', (f_x_1-15., f_y-15.), font_size, 1.);
-        let mut s = effects::text::letter('d', (f_x_1, f_y-15.), font_size, 1.);
-        let mut i = effects::text::letter('e', (f_x_1+15., f_y-15.), font_size, 1.);
-        let mut c = effects::text::letter('e', (f_x_1+30., f_y-15.), font_size, 1.);
+        let mut u = effects::text::letter('u', (f_x_1-15., f_y-15.), font_size, 1.);
+        let mut s = effects::text::letter('s', (f_x_1, f_y-15.), font_size, 1.);
+        let mut i = effects::text::letter('i', (f_x_1+15., f_y-15.), font_size, 1.);
+        let mut c = effects::text::letter('c', (f_x_1+30., f_y-15.), font_size, 1.);
         music.append(&mut u);
         music.append(&mut s);
         music.append(&mut i);
         music.append(&mut c);
         
-        let mut spew = effects::text::letter('c', (f_x_2-30., f_y), font_size, 1.);
-        let mut y = effects::text::letter('o', (f_x_2-15., f_y), font_size, 1.);
-        let mut s = effects::text::letter('c', (f_x_2+15., f_y), font_size, 1.);
-        let mut p = effects::text::letter('o', (f_x_2+30., f_y), font_size, 1.);
-        let mut e = effects::text::letter('d', (f_x_2+45., f_y), font_size, 1.);
-        let mut w = effects::text::letter('e', (f_x_2+60., f_y), font_size, 1.);
+        let mut spew = effects::text::letter('b', (f_x_2-30., f_y), font_size, 1.);
+        let mut y = effects::text::letter('y', (f_x_2-15., f_y), font_size, 1.);
+        let mut s = effects::text::letter('s', (f_x_2+15., f_y), font_size, 1.);
+        let mut p = effects::text::letter('p', (f_x_2+30., f_y), font_size, 1.);
+        let mut e = effects::text::letter('e', (f_x_2+45., f_y), font_size, 1.);
+        let mut w = effects::text::letter('w', (f_x_2+60., f_y), font_size, 1.);
         spew.append(&mut y);
         spew.append(&mut s);
         spew.append(&mut p);
