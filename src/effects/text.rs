@@ -287,6 +287,25 @@ pub fn letter(char: char, coord: (f32, f32), size: f32, spread: f32) -> Vec<Poin
                 (Point::new(7., 0.), Point::new(9., 0.)),
             ],
         ),
+        (
+            '&',
+            vec![
+                (Point::new(2., 0.), Point::new(6., 0.)),
+                (Point::new(1., 0.), Point::new(7., -1.)),
+                (Point::new(1., -2.), Point::new(2., -2.)),
+                (Point::new(6., -2.), Point::new(7., -2.)),
+                (Point::new(1., -3.), Point::new(7., -3.)),
+                (Point::new(2., -4.), Point::new(6., -4.)),
+                (Point::new(1., -5.), Point::new(7., -5.)),
+                (Point::new(9., -5.), Point::new(9., -5.)),
+                (Point::new(0., -6.), Point::new(8., -6.)),
+                (Point::new(0., -7.), Point::new(1., -7.)),
+                (Point::new(7., -7.), Point::new(8., -7.)),
+                (Point::new(0., -8.), Point::new(8., -8.)),
+                (Point::new(1., -9.), Point::new(7., -9.)),
+                (Point::new(9., -9.), Point::new(9., -9.)),
+            ],
+        ),
     ];
 
     let font = HashMap::from(font);

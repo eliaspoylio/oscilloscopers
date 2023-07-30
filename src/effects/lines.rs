@@ -4,11 +4,11 @@ use crate::vector::{create_line_float, draw_points_float, Point};
 
 const SIZE_F: f32 = crate::SIZE_F;
 
-pub fn lines() -> Vec<(f32, f32)> {
+pub fn lines(l: i32) -> Vec<(f32, f32)> {
     let mut scene: Vec<(f32, f32)> = Vec::new();
     const LINES: usize = 16;
 
-    for i in 1..1000 {
+    for i in 1..l {
         let mut lines: Vec<Point> = Vec::new();
         for j in 0..LINES {
             let f = i as f32 / SIZE_F;

@@ -36,11 +36,11 @@ fn main() -> Result<(), hound::Error> {
     let mut f_x_0 = 0.;
     let mut f_x_1 = 0.;
     let mut f_x_2 = 0.;
-    let mut f_y_0 = 20.;
-    let mut f_y_1 = 0.;
-    let mut f_y_2 = 0.;
+    let f_y_0 = 20.;
+    let f_y_1 = 0.;
+    let f_y_2 = 0.;
     let f_y = 0.;
-    let mut spread = 5.;
+    let mut spread = 6.;
     for i in 0..200 {
         if i < 50 {
             spread -= 0.1;
@@ -58,9 +58,11 @@ fn main() -> Result<(), hound::Error> {
         let mut o = effects::text::letter('o', (f_x_0-15., f_y_0), font_size, spread);
         let mut d = effects::text::letter('d', (f_x_0, f_y_0), font_size, spread);
         let mut e = effects::text::letter('e', (f_x_0+15., f_y_0), font_size, spread);
+        let mut and = effects::text::letter('&', (f_x_0+30., f_y_0), font_size, spread);
         code.append(&mut o);
         code.append(&mut d);
         code.append(&mut e);
+        code.append(&mut and);
 
         let mut music = effects::text::letter('m', (f_x_1-30., f_y_1), font_size, spread);
         let mut u = effects::text::letter('u', (f_x_1-15., f_y_1), font_size, spread);
@@ -85,7 +87,7 @@ fn main() -> Result<(), hound::Error> {
         }
     }
 
-    spread = 5.;
+    spread = 6.;
     for i in 0..300 {
         if i < 50 {
             spread -= 0.1;
@@ -104,38 +106,40 @@ fn main() -> Result<(), hound::Error> {
         let mut w = effects::text::letter('w', (f_x_2+60., f_y_2), font_size, spread);
         by.append(&mut y);
 
+        spew.append(&mut w);
+
         spew.append(&mut p);
         spew.append(&mut e);
-        spew.append(&mut w);
+        
         let mut c = -1;
         spew.retain(|_| {
             c += 1;
             return c % 2 == 0;
         });
         by.append(&mut spew);
-        let points = draw_points_float(1. / 50., by, 8);
+        let points = draw_points_float(1. / 50., by, 10);
         for point in points {
             if point.0 > -0.7 {scene.push(point);}    
         }
     };
     
-    for i in effects::lines::lines() {
+    for i in effects::lines::lines(1000) {
         scene.push(i);
     }
     
-    for i in effects::landscape::landscape() {
+    for i in effects::landscape::landscape(2000) {
         scene.push(i);
     }
     
-    for i in effects::blocks::blocks() {
+    for i in effects::blocks::blocks(1000) {
         scene.push(i);
     }
 
-    for i in effects::cube::cube() {
+    for i in effects::cube::cube(2000) {
         scene.push(i);
     }
     
-    for i in effects::stars::stars() {
+    for i in effects::stars::stars(2000) {
         scene.push(i);
     } 
     

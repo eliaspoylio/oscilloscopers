@@ -91,7 +91,7 @@ fn zoom(vertices: [&mut VertexF; 8]) {
     }
 }
 
-pub fn blocks() -> Vec<(f32, f32)> {
+pub fn blocks(l: i32) -> Vec<(f32, f32)> {
     let mut blocks: Vec<(f32, f32)> = vec![];
     let mut cubes = [
         &mut Cube::new(-20., 20.),
@@ -103,7 +103,7 @@ pub fn blocks() -> Vec<(f32, f32)> {
         cube.init();
     }
 
-    for _i in 1..1000 {
+    for _i in 1..l {
         for cube in cubes.iter_mut() {
             if cube.vertices[0].z <= END {
                 cube.direction = false;

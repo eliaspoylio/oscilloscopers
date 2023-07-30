@@ -7,7 +7,7 @@ use crate::{
 
 const STEP: f32 = 0.1;
 
-pub fn cube() -> Vec<(f32, f32)> {
+pub fn cube(l: i32) -> Vec<(f32, f32)> {
     let mut cube: Vec<(f32, f32)> = Vec::new();
     let mut v_af = VertexF::new(-20., 20., 0.);
     let mut v_bf = VertexF::new(20., 20., 0.);
@@ -28,12 +28,12 @@ pub fn cube() -> Vec<(f32, f32)> {
 
     let fade = 0.5;
 
-    for i in 1..2000 {
+    for i in 1..l {
         let vertices = [
             &mut v_af, &mut v_bf, &mut v_cf, &mut v_df, &mut v_ab, &mut v_bb, &mut v_cb, &mut v_db,
         ];
         for v in vertices {
-            if i > 1750 {
+            if i > l-l/8 {
                 v.min(fade);
             }
             v.rotate(PI / 180., PI / 180., PI / 180.)

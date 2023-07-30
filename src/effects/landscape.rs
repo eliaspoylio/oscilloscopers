@@ -118,7 +118,7 @@ fn matrix_matrix_mult(a: &mut [[f64; 4]; 4], b: &mut [[f64; 4]; 4]) -> [[f64; 4]
     r
 }
 
-pub fn landscape() -> Vec<(f32, f32)> {
+pub fn landscape(frames: i32) -> Vec<(f32, f32)> {
     let mut scene: Vec<(f32, f32)> = Vec::new();
 
     ////////////////////////////////////////////
@@ -217,7 +217,7 @@ pub fn landscape() -> Vec<(f32, f32)> {
 
     let mut s_count = 0;
 
-    for _i in 1..2000 {
+    for _i in 1..frames {
         let mut frame: Vec<Point> = Vec::new();
 
         count += 1;
