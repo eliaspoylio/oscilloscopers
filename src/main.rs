@@ -1,9 +1,11 @@
 use hound;
+use itertools::{EitherOrBoth::*, Itertools};
+use libxm::XMContext;
 use std::i16;
 
 mod matrix;
-mod vector;
 mod raster;
+mod vector;
 use crate::vector::draw_points_float;
 
 mod effects;
@@ -19,19 +21,27 @@ const SIZE_F: f32 = 100.;
 const CANVAS_F: f32 = 200.;
 const DISTANCE_F: f32 = 50.;
 
-fn main() -> Result<(), hound::Error> {
+fn main() -> () {
     let spec = hound::WavSpec {
-        channels: 2,
+        channels: 4,
         sample_rate: SAMPLE_RATE,
         bits_per_sample: 16,
         sample_format: hound::SampleFormat::Int,
     };
     let amplitude = i16::MAX as f32;
-    let mut writer = hound::WavWriter::create("letters.wav", spec).unwrap();
+    let mut writer = hound::WavWriter::create("cesium.wav", spec).unwrap();
     let mut scene: Vec<(f32, f32)> = Vec::new();
 
     ////////////////////////////////////////////
-    
+
+    let bytes = include_bytes!("../test.xm");
+    let data = bytes.to_vec();
+
+    let mut xm = XMContext::new(&data, 96000).unwrap();
+    xm.set_max_loop_count(1);
+
+    ////////////////////////////////////////////
+
     let font_size = 1.1;
     let mut f_x_0 = 0.;
     let mut f_x_1 = 0.;
@@ -54,28 +64,29 @@ fn main() -> Result<(), hound::Error> {
         f_x_0 -= 0.0;
         f_x_1 -= 0.0;
         f_x_2 -= 0.0;
-        let mut code = effects::text::letter('c', (f_x_0-30., f_y_0), font_size, spread);
-        let mut o = effects::text::letter('o', (f_x_0-15., f_y_0), font_size, spread);
+        let mut code = effects::text::letter('c', (f_x_0 - 30., f_y_0), font_size, spread);
+        let mut o = effects::text::letter('o', (f_x_0 - 15., f_y_0), font_size, spread);
         let mut d = effects::text::letter('d', (f_x_0, f_y_0), font_size, spread);
-        let mut e = effects::text::letter('e', (f_x_0+15., f_y_0), font_size, spread);
-        let mut and = effects::text::letter('&', (f_x_0+30., f_y_0), font_size, spread);
+        let mut e = effects::text::letter('e', (f_x_0 + 15., f_y_0), font_size, spread);
+        let mut and = effects::text::letter('&', (f_x_0 + 30., f_y_0), font_size, spread);
         code.append(&mut o);
         code.append(&mut d);
         code.append(&mut e);
         code.append(&mut and);
 
-        let mut music = effects::text::letter('m', (f_x_1-30., f_y_1), font_size, spread);
-        let mut u = effects::text::letter('u', (f_x_1-15., f_y_1), font_size, spread);
+        let mut music = effects::text::letter('m', (f_x_1 - 30., f_y_1), font_size, spread);
+        let mut u = effects::text::letter('u', (f_x_1 - 15., f_y_1), font_size, spread);
         let mut s = effects::text::letter('s', (f_x_1, f_y_1), font_size, spread);
-        let mut i = effects::text::letter('i', (f_x_1+15., f_y_1), font_size, spread);
-        let mut c = effects::text::letter('c', (f_x_1+30., f_y_1), font_size, spread);
+        let mut i = effects::text::letter('i', (f_x_1 + 15., f_y_1), font_size, spread);
+        let mut c = effects::text::letter('c', (f_x_1 + 30., f_y_1), font_size, spread);
         music.append(&mut u);
         music.append(&mut s);
         music.append(&mut i);
         music.append(&mut c);
 
         code.append(&mut music);
-        let mut text: Vec<vector::Point> = code.into_iter().filter(|p| p.x > -SIZE_F*0.7).collect();
+        let mut text: Vec<vector::Point> =
+            code.into_iter().filter(|p| p.x > -SIZE_F * 0.7).collect();
         let mut c = -1;
         text.retain(|_| {
             c += 1;
@@ -83,7 +94,9 @@ fn main() -> Result<(), hound::Error> {
         });
         let points = draw_points_float(1. / 50., text, 8);
         for point in points {
-            if point.0 > -0.7 {scene.push(point);}    
+            if point.0 > -0.7 {
+                scene.push(point);
+            }
         }
     }
 
@@ -98,19 +111,19 @@ fn main() -> Result<(), hound::Error> {
         if i > 250 {
             spread += 0.1;
         }
-        let mut by = effects::text::letter('b', (f_x_2-30., f_y_2), font_size, spread);
-        let mut y = effects::text::letter('y', (f_x_2-15., f_y_2), font_size,spread);
-        let mut spew = effects::text::letter('s', (f_x_2+15., f_y_2), font_size, spread);
-        let mut p = effects::text::letter('p', (f_x_2+30., f_y_2), font_size, spread);
-        let mut e = effects::text::letter('e', (f_x_2+45., f_y_2), font_size, spread);
-        let mut w = effects::text::letter('w', (f_x_2+60., f_y_2), font_size, spread);
+        let mut by = effects::text::letter('b', (f_x_2 - 30., f_y_2), font_size, spread);
+        let mut y = effects::text::letter('y', (f_x_2 - 15., f_y_2), font_size, spread);
+        let mut spew = effects::text::letter('s', (f_x_2 + 15., f_y_2), font_size, spread);
+        let mut p = effects::text::letter('p', (f_x_2 + 30., f_y_2), font_size, spread);
+        let mut e = effects::text::letter('e', (f_x_2 + 45., f_y_2), font_size, spread);
+        let mut w = effects::text::letter('w', (f_x_2 + 60., f_y_2), font_size, spread);
         by.append(&mut y);
 
         spew.append(&mut w);
 
         spew.append(&mut p);
         spew.append(&mut e);
-        
+
         let mut c = -1;
         spew.retain(|_| {
             c += 1;
@@ -119,18 +132,20 @@ fn main() -> Result<(), hound::Error> {
         by.append(&mut spew);
         let points = draw_points_float(1. / 50., by, 10);
         for point in points {
-            if point.0 > -0.7 {scene.push(point);}    
+            if point.0 > -0.7 {
+                scene.push(point);
+            }
         }
-    };
-    
+    }
+
     for i in effects::lines::lines(1600) {
         scene.push(i);
     }
-    
+
     for i in effects::landscape::landscape(1600) {
         scene.push(i);
     }
-    
+
     for i in effects::blocks::blocks(800) {
         scene.push(i);
     }
@@ -138,14 +153,36 @@ fn main() -> Result<(), hound::Error> {
     for i in effects::cube::cube(1600) {
         scene.push(i);
     }
-    
+
     for i in effects::stars::stars(1920) {
         scene.push(i);
-    } 
-    
+    }
 
     ////////////////////////////////////////////
 
+    let mut xm_channel = Vec::new();
+    let mut buffer = [0.0; 4096];
+    while xm.loop_count() == 0 {
+        xm.generate_samples(&mut buffer);
+        for b in buffer {
+            xm_channel.push(b);
+        }
+    }
+
+    for pair in xm_channel.iter().zip_longest(scene.clone().iter()) {
+        match pair {
+            Both(l, r) => {
+            writer.write_sample((r.0 * amplitude) as i16).unwrap();
+            writer.write_sample((r.1 * amplitude) as i16).unwrap();
+            writer.write_sample((l * amplitude) as i16).unwrap();
+            writer.write_sample((l * amplitude) as i16).unwrap();
+            },
+            Left(l) => (),
+            Right(r) => (),
+        }
+    }
+
+    /*
     for f in scene {
         match (f.0, f.1) {
             (_, _) => {
@@ -155,8 +192,9 @@ fn main() -> Result<(), hound::Error> {
         }
 
     }
+    */
 
     println!("Length: {}", writer.len());
     println!("Duration: {}", writer.duration() / spec.sample_rate);
-    writer.finalize()
+    writer.finalize().unwrap();
 }
