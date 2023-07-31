@@ -88,7 +88,7 @@ fn main() -> Result<(), hound::Error> {
     }
 
     spread = 6.;
-    for i in 0..300 {
+    for i in 0..200 {
         if i < 50 {
             spread -= 0.1;
         }
@@ -123,23 +123,23 @@ fn main() -> Result<(), hound::Error> {
         }
     };
     
-    for i in effects::lines::lines(1000) {
+    for i in effects::lines::lines(1600) {
         scene.push(i);
     }
     
-    for i in effects::landscape::landscape(2000) {
+    for i in effects::landscape::landscape(1600) {
         scene.push(i);
     }
     
-    for i in effects::blocks::blocks(1000) {
+    for i in effects::blocks::blocks(800) {
         scene.push(i);
     }
 
-    for i in effects::cube::cube(2000) {
+    for i in effects::cube::cube(1600) {
         scene.push(i);
     }
     
-    for i in effects::stars::stars(2000) {
+    for i in effects::stars::stars(1920) {
         scene.push(i);
     } 
     
@@ -147,8 +147,13 @@ fn main() -> Result<(), hound::Error> {
     ////////////////////////////////////////////
 
     for f in scene {
-        writer.write_sample((f.0 * amplitude) as i16).unwrap();
-        writer.write_sample((f.1 * amplitude) as i16).unwrap();
+        match (f.0, f.1) {
+            (_, _) => {
+                writer.write_sample((f.0 * amplitude) as i16).unwrap();
+                writer.write_sample((f.1 * amplitude) as i16).unwrap();
+            }
+        }
+
     }
 
     println!("Length: {}", writer.len());
