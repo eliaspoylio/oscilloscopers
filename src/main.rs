@@ -23,7 +23,7 @@ const DISTANCE_F: f32 = 50.;
 
 fn main() -> () {
     let spec = hound::WavSpec {
-        channels: 2,
+        channels: 4,
         sample_rate: SAMPLE_RATE,
         bits_per_sample: 16,
         sample_format: hound::SampleFormat::Int,
@@ -38,7 +38,7 @@ fn main() -> () {
     let bytes = include_bytes!("../test.xm");
     let data = bytes.to_vec();
 
-    let mut xm = XMContext::new(&data, 96000).unwrap();
+    let mut xm: XMContext = XMContext::new(&data, 48000).unwrap();
     xm.set_max_loop_count(1);
 
     ////////////////////////////////////////////
@@ -53,13 +53,13 @@ fn main() -> () {
     let f_y_2 = 0.;
     let f_y = 0.;
 
-    let mut spread = 6.;
+    let mut spread = 7.;
     for i in 0..320 {
         if i < 40 {
             spread -= 0.125;
         }
         if i == 40 {
-            spread = 1.;
+            spread = 2.;
         }
         if i > 280 {
             spread += 0.125;
@@ -68,12 +68,12 @@ fn main() -> () {
         f_x_0 -= 0.0;
         f_x_1 -= 0.0;
         f_x_2 -= 0.0;
-        let mut cesium = effects::text::letter('c', (f_x_0 - 50., f_y_0), title_font_size, spread);
-        let mut e = effects::text::letter('e', (f_x_0 - 30., f_y_0), title_font_size, spread);
-        let mut s = effects::text::letter('s', (f_x_0 - 10., f_y_0), title_font_size, spread);
-        let mut i = effects::text::letter('i', (f_x_0 + 10., f_y_0), title_font_size, spread);
-        let mut u = effects::text::letter('u', (f_x_0 + 30., f_y_0), title_font_size, spread);
-        let mut m = effects::text::letter('m', (f_x_0 + 50., f_y_0), title_font_size, spread);
+        let mut cesium = effects::text::letter('c', (f_x_0 - 50., 0.), title_font_size, spread);
+        let mut e = effects::text::letter('e', (f_x_0 - 30., 0.), title_font_size, spread);
+        let mut s = effects::text::letter('s', (f_x_0 - 10., 0.), title_font_size, spread);
+        let mut i = effects::text::letter('i', (f_x_0 + 10., 0.), title_font_size, spread);
+        let mut u = effects::text::letter('u', (f_x_0 + 30., 0.), title_font_size, spread);
+        let mut m = effects::text::letter('m', (f_x_0 + 50., 0.), title_font_size, spread);
         cesium.append(&mut e);
         cesium.append(&mut s);
         cesium.append(&mut i);
@@ -87,17 +87,17 @@ fn main() -> () {
         });
         let points = draw_points_float(1. / 40., cesium, 8);
         for point in points {
-            title.push(point);
+            scene.push(point);
         }
     }
 
-    let mut spread = 6.;
+    let mut spread = 7.;
     for i in 0..160 {
         if i < 40 {
             spread -= 0.125;
         }
         if i == 40 {
-            spread = 1.;
+            spread = 2.;
         }
         if i > 120 {
             spread += 0.125;
@@ -141,23 +141,23 @@ fn main() -> () {
         }
     }
 
-    spread = 6.;
+    spread = 7.;
     for i in 0..160 {
         if i < 40 {
             spread -= 0.125;
         }
         if i == 40 {
-            spread = 1.;
+            spread = 2.;
         }
         if i > 120 {
             spread += 0.125;
         }
-        let mut by = effects::text::letter('b', (f_x_2 - 30., f_y_2), font_size, spread);
-        let mut y = effects::text::letter('y', (f_x_2 - 15., f_y_2), font_size, spread);
-        let mut spew = effects::text::letter('s', (f_x_2 + 15., f_y_2), font_size, spread);
-        let mut p = effects::text::letter('p', (f_x_2 + 30., f_y_2), font_size, spread);
-        let mut e = effects::text::letter('e', (f_x_2 + 45., f_y_2), font_size, spread);
-        let mut w = effects::text::letter('w', (f_x_2 + 60., f_y_2), font_size, spread);
+        let mut by = effects::text::letter('b', (f_x_2 - 10., f_y_0), font_size, spread);
+        let mut y = effects::text::letter('y', (f_x_2 + 10., f_y_0), font_size, spread);
+        let mut spew = effects::text::letter('s', (f_x_2 - 15., f_y_1), font_size, spread);
+        let mut p = effects::text::letter('p', (f_x_2 - 5., f_y_1), font_size, spread);
+        let mut e = effects::text::letter('e', (f_x_2 + 5., f_y_1), font_size, spread);
+        let mut w = effects::text::letter('w', (f_x_2 + 15., f_y_1), font_size, spread);
         by.append(&mut y);
 
         spew.append(&mut w);
@@ -195,7 +195,7 @@ fn main() -> () {
         scene.push(i);
     }
 
-    for i in effects::stars::stars(1920) {
+    for i in effects::stars::stars(4000) {
         scene.push(i);
     }
 
@@ -206,42 +206,39 @@ fn main() -> () {
     while xm.loop_count() == 0 {
         xm.generate_samples(&mut buffer);
         for b in buffer {
-            xm_channel.push(b);
+            xm_channel.push(b*2.);
         }
     }
 
-    let decay = 0.000001;
+    for _ in 0..SAMPLE_RATE/10 {
+        writer.write_sample((0.2 * amplitude) as i16).unwrap();
+        writer.write_sample((0.2 * amplitude) as i16).unwrap();
+        writer.write_sample((0.2 * amplitude) as i16).unwrap();
+        writer.write_sample((0.2 * amplitude) as i16).unwrap();
+    }
+/*
+    let decay = 0.0000001;
     let mut factor = 1.;
     for f in title {
         writer.write_sample((f.0 * factor * amplitude) as i16).unwrap();
         writer.write_sample((f.1 * factor * amplitude) as i16).unwrap();
+        //writer.write_sample((0. * amplitude) as i16).unwrap();
+        //writer.write_sample((0. * amplitude) as i16).unwrap();
         factor -= decay;
     }
-
+ */
     for pair in xm_channel.iter().zip_longest(scene.clone().iter()) {
         match pair {
             Both(l, r) => {
                 writer.write_sample((r.0 * amplitude) as i16).unwrap();
                 writer.write_sample((r.1 * amplitude) as i16).unwrap();
-                //writer.write_sample((l * amplitude) as i16).unwrap();
-                //writer.write_sample((l * amplitude) as i16).unwrap();
+                writer.write_sample((l * amplitude) as i16).unwrap();
+                writer.write_sample((l * amplitude) as i16).unwrap();
             }
-            Left(l) => (),
-            Right(r) => (),
+            Left(_l) => (),
+            Right(_r) => (),
         }
     }
-
-    /*
-    for f in scene {
-        match (f.0, f.1) {
-            (_, _) => {
-                writer.write_sample((f.0 * amplitude) as i16).unwrap();
-                writer.write_sample((f.1 * amplitude) as i16).unwrap();
-            }
-        }
-
-    }
-    */
 
     println!("Length: {}", writer.len());
     println!("Duration: {}", writer.duration() / spec.sample_rate);

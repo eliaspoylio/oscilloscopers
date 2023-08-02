@@ -70,9 +70,9 @@ pub fn stars(frames_24: i32) -> Vec<(f32, f32)> {
                 star.init_star();
             }
         }
-        let frame_points = draw_points_float(1. / 24., frame, 2);
+        let frame_points = draw_points_float(1. / 50., frame, 2);
         for point in frame_points {
-            if _i > frames_24-frames_24/4 {
+            if _i > frames_24-frames_24/2 {
                 scene.push((
                     point.0 * fade,
                     point.1 * fade
