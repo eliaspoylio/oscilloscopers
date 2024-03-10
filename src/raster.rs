@@ -43,6 +43,12 @@ impl Vertex {
    } 
 }
 
+#[derive(Clone)]
+pub struct Bitmap {
+    pub size: i32,
+    pub points: Vec<Point>
+}
+
 fn _swap_points(a: Point, b: Point) -> (Point, Point) {
     (b, a)
 }

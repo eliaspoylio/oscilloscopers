@@ -6,3 +6,6 @@ pub mod landscape;
 pub mod cube;
 pub mod blocks;
 pub mod stars;
+pub mod points;
+pub mod gameoflife;
+pub mod water;
